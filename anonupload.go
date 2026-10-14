@@ -41,7 +41,16 @@ func main() {
 			}
 			defer f.Close()
 
-			err = webp.Encode(f, content, &encoder.Options{})
+
+			opts, err := encoder.NewLossyEncoderOptions(encoder.PresetDefault, 80)
+			if err != nil {
+				fmt.Println(err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+
+			}
+
+			err = webp.Encode(w, content, opts)
 			if err != nil {
 				fmt.Println(err)
 				http.Error(w, err.Error(), http.StatusInternalServerError)
