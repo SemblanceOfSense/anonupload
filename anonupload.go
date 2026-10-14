@@ -10,8 +10,9 @@ import (
 	"strconv"
 	"strings"
 
-    "github.com/kolesa-team/go-webp/webp"
-    "github.com/kolesa-team/go-webp/decoder"
+	"github.com/kolesa-team/go-webp/decoder"
+	"github.com/kolesa-team/go-webp/encoder"
+	"github.com/kolesa-team/go-webp/webp"
 )
 
 type FileList struct {
@@ -24,7 +25,7 @@ func main() {
 	http.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
-			content, err := webp.Decode(r.Body, )
+			content, err := webp.Decode(r.Body, &decoder.Options{})
 			if err != nil {
 				fmt.Println(err)
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -40,9 +41,7 @@ func main() {
 			}
 			defer f.Close()
 
-			err = webp.Encode(f, content, &webp.Options{
-				Quality: 100,
-			})
+			err = webp.Encode(f, content, &encoder.Options{})
 			if err != nil {
 				fmt.Println(err)
 				http.Error(w, err.Error(), http.StatusInternalServerError)
