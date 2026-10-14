@@ -2,15 +2,14 @@
 <html>
     <body>
         <p>Submit a file here!</p>
-        <form action="/upload" id="uploadForm">
+        <form action="/upload" id="uploadForm" method="post">
             <input type="file" id="myFile" name="filename">
             <input type="submit">
         </form>
         <p>------------------------------------------------</p>
-        <br>
         <p>Displayed images are here:</p>
         <div id="displayedImagesDiv"></div>
 
-        <script src="main.js">
+        <script src="/main.js"></script>
     </body>
 </html>

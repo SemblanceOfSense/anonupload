@@ -3,13 +3,15 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"image/jpeg"
 	"math/rand"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+
+    "github.com/kolesa-team/go-webp/webp"
+    "github.com/kolesa-team/go-webp/decoder"
 )
 
 type FileList struct {
@@ -17,30 +19,12 @@ type FileList struct {
 }
 
 func main() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodGet:
-			body, err := os.ReadFile("/var/www/anonupload/index.html")
-			if err != nil {
-				fmt.Println(err)
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-
-			status, err := w.Write(body)
-			if err != nil {
-				fmt.Println(err)
-			}
-			if status != 200 {
-				fmt.Println(http.StatusText(status))
-			}
-		}
-	})
+    http.Handle("/", http.FileServer(http.Dir("/var/www/anonupload/static")))
 
 	http.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodPost:
-			content, err := jpeg.Decode(r.Body)
+			content, err := webp.Decode(r.Body, )
 			if err != nil {
 				fmt.Println(err)
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -48,7 +32,7 @@ func main() {
 			}
 
 			rand := rand.Int()
-			f, err := os.Create("/var/www/anonupload/files/" + filepath.Base(strconv.Itoa(rand) + ".jpeg"))
+			f, err := os.Create("/var/www/anonupload/files/" + filepath.Base(strconv.Itoa(rand) + ".webp"))
 			if err != nil {
 				fmt.Println(err)
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -56,7 +40,7 @@ func main() {
 			}
 			defer f.Close()
 
-			err = jpeg.Encode(f, content, &jpeg.Options{
+			err = webp.Encode(f, content, &webp.Options{
 				Quality: 100,
 			})
 			if err != nil {
@@ -81,7 +65,7 @@ func main() {
 
 			var filelist FileList
 			for _, v := range files {
-				if (strings.Contains(v.Name(), ".jpeg")) {
+				if (strings.Contains(v.Name(), ".webp")) {
 					filelist.Files = append(filelist.Files, v.Name())
 				}
 			}
