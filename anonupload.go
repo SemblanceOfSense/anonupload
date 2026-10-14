@@ -50,7 +50,7 @@ func main() {
 
 			}
 
-			err = webp.Encode(w, content, opts)
+			err = webp.Encode(f, content, opts)
 			if err != nil {
 				fmt.Println(err)
 				http.Error(w, err.Error(), http.StatusInternalServerError)
